@@ -3,14 +3,16 @@ import * as XLSX from "xlsx";
 export default {
   data() {
     return {
+      fName: (this.fileName = false),
+
       fileName: {},
       arr: [
         {
           fileName: "file-1",
           value: {
-            codeColNum: 2,
-            countColNum: 6,
-            priceColNum: 7,
+            codeColNum: 3,
+            countColNum: 7,
+            priceColNum: 8,
           },
         },
         {
@@ -24,18 +26,18 @@ export default {
         {
           fileName: "file-3",
           value: {
-            codeColNum: 2,
-            countColNum: 6,
-            priceColNum: 7,
+            codeColNum: 7,
+            countColNum: 20,
+            priceColNum: 23,
           },
         },
       ],
     };
   },
-
   methods: {
-    onSelectionChanged(e) {
-      console.log(e);
+    isDisabled() {
+      if (this.fileName) this.fName = true;
+      else this.fName = false;
     },
 
     onFileChangeReadThree(reader) {
@@ -47,9 +49,9 @@ export default {
 
       let rows = XLSX.utils.sheet_to_json(ws, { header: 1 }); //  генерирует массив объектов
       let result = [];
-      let codeColNum = data.value, // колонки таблицы
-        countColNum = data.value,
-        priceColNum = data.value;
+      let codeColNum = this.fileName.codeColNum, // колонки таблицы
+        countColNum = this.fileName.countColNum,
+        priceColNum = this.fileName.priceColNum;
       // Цикл по строкам
       for (let i = 0; i < rows.length; i++) {
         let currentRow = rows[i];
@@ -64,13 +66,12 @@ export default {
             price: currentRow[priceColNum],
           });
       }
-
       console.log(result);
     },
 
     onFileChangeThree(e) {
       let file = e.target.files[0];
-      let reader = new FileReader();
+      let reader = new FileReader(); // начинает чтение файла, но не ожидает получения данных
       reader.readAsBinaryString(file);
       reader.onload = () => this.onFileChangeReadThree(reader);
     },
