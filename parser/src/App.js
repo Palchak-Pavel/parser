@@ -3,12 +3,12 @@ import * as XLSX from "xlsx";
 export default {
   data() {
     return {
-      fName: (this.fileName = false),
+      showButton: (this.selectedFileType = false),
 
-      fileName: {},
+      selectedFileType: {},
       arr: [
         {
-          fileName: "file-1",
+          selectedFileType: "file-1",
           value: {
             codeColNum: 3,
             countColNum: 7,
@@ -16,7 +16,7 @@ export default {
           },
         },
         {
-          fileName: "file-2",
+          selectedFileType: "file-2",
           value: {
             codeColNum: 0,
             countColNum: 1,
@@ -24,7 +24,7 @@ export default {
           },
         },
         {
-          fileName: "file-3",
+          selectedFileType: "file-3",
           value: {
             codeColNum: 7,
             countColNum: 20,
@@ -36,29 +36,41 @@ export default {
   },
   methods: {
     isDisabled() {
-      if (this.fileName) this.fName = true;
-      else this.fName = false;
+
+      if (this.selectedFileType) this.showButton = true;
     },
 
-    onFileChangeReadThree(reader) {
+    onFileChangeThree(e) {
+      let file = e.target.files[0];
+      let reader = new FileReader(); // начинает чтение файла, но не ожидает получения данных
+      reader.readAsBinaryString(file);
+      reader.onload = () => this.onFileChangeReadThree(reader);
+    },
+
+    globalVariables(reader){
       let data = reader.result;
       const wb = XLSX.read(data, { type: "binary" }); // ??? тип
       //считываем 1 лист
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
 
-      let rows = XLSX.utils.sheet_to_json(ws, { header: 1 }); //  генерирует массив объектов
+      return XLSX.utils.sheet_to_json(ws, { header: 1 }); //  генерирует массив объектов
+    },
+
+    onFileChangeReadThree(reader) {
+
+      let codeColNum = this.selectedFileType.codeColNum, // колонки таблицы
+        countColNum = this.selectedFileType.countColNum,
+        priceColNum = this.selectedFileType.priceColNum;
+
+      let rows= this.globalVariables(reader);
       let result = [];
-      let codeColNum = this.fileName.codeColNum, // колонки таблицы
-        countColNum = this.fileName.countColNum,
-        priceColNum = this.fileName.priceColNum;
       // Цикл по строкам
       for (let i = 0; i < rows.length; i++) {
         let currentRow = rows[i];
         let productCount = parseInt(currentRow[countColNum]); //принимает строку в качестве аргумента и возвращает целое число
         if (!isNaN(productCount))
           // определяет является ли литерал или переменная нечисловым значением
-
           result.push({
             // добавляем значения в массив
             productCode: currentRow[codeColNum],
@@ -69,20 +81,9 @@ export default {
       console.log(result);
     },
 
-    onFileChangeThree(e) {
-      let file = e.target.files[0];
-      let reader = new FileReader(); // начинает чтение файла, но не ожидает получения данных
-      reader.readAsBinaryString(file);
-      reader.onload = () => this.onFileChangeReadThree(reader);
-    },
-
+    ////////////////////////////////////////////
     onFileChangeReadTwo(reader) {
-      let data = reader.result;
-      const wb = XLSX.read(data, { type: "binary" });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-
-      let rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      let rows= this.globalVariables(reader);
       let result = [];
 
       // проверяем первую ячейку таблицы
@@ -91,6 +92,7 @@ export default {
       let codeColNum = 0,
         countColNum = 1;
       if (header === "GOODWILL ОСТАТКИ *") (codeColNum = 1), (countColNum = 7);
+
 
       for (let i = 0; i < rows.length; i++) {
         let currentRow = rows[i];
