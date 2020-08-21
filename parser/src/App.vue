@@ -4,6 +4,12 @@
       <h4>2 колонки</h4>
       <input type="file" @change="onFileChangeTwo" />
 
+      <ul v-if="showTwoColumns">
+        <li v-for="(item, i) in twoColumnsParsedData" :key="i">
+          {{item.productCode}}
+        </li>
+      </ul>
+
       <h4>3 колонки</h4>
 
       <label>

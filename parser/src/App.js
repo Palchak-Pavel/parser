@@ -20,8 +20,6 @@ function funcTarget(e, parserFunc, params){
       resolve(data);
       reject (new Error("error"));
     }
-
-
 })
   return promise;
  }
@@ -73,11 +71,15 @@ function onFileChangeReadTwo(reader) {
       }
 
     return result;
+  // console.log(result);
 }
 
 export default {
   data() {
     return {
+
+      twoColumnsParsedData: [],
+
       showButton: (this.selectedFileType = false),
 
       selectedFileType: {},
@@ -115,19 +117,21 @@ export default {
     },
     ////////////////////////////////////////////
     onFileChangeThree(e){
-      let parsedData;
-       funcTarget(e, onFileChangeReadThree, this.selectedFileType).then(
-           res => parsedData = res
-       )
-      console.log(parsedData);
+     let fc=  funcTarget(e, onFileChangeReadThree, this.selectedFileType);
+      console.log(fc);
     },
     ////////////////////////////////////////////
     onFileChangeTwo(e) {
-      let parsedData;
       funcTarget(e, onFileChangeReadTwo).then(
-          res => parsedData = res
+          parsedFuncData => {
+            this.twoColumnsParsedData = parsedFuncData.filter(x => x.productCount > 0);
+          }
       );
-      console.log(parsedData)
+    },
+  },
+  computed: {
+    showTwoColumns() {
+      return this.twoColumnsParsedData.length > 0;
     }
   }
   }
