@@ -27,10 +27,17 @@
         v-if="showButton"
         class="threeCol"
       />
+
+      <ul v-if="showTreeColumns">
+        <template v-for="(item, i) in selectedFileType" >
+        <li :key="i">
+          {{item.productCode}} - {{item.productCount}} -  {{item.price}}
+        </li>
+         </template>
+      </ul>
     </div>
   </div>
 </template>
-
 
 <script src="./App.js"></script>
 

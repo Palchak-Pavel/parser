@@ -23,9 +23,7 @@ function funcTarget(e, parserFunc, params){
 })
   return promise;
  }
-
 function onFileChangeReadThree(reader, params) {
-
     let codeColNum = params.codeColNum, // колонки таблицы
       countColNum = params.countColNum,
       priceColNum = params.priceColNum;
@@ -45,7 +43,6 @@ function onFileChangeReadThree(reader, params) {
         price: currentRow[priceColNum],
       });
   }
-  console.log(result);
   return result;
   }
 
@@ -115,25 +112,34 @@ export default {
     isDisabled() {
       if (this.selectedFileType) this.showButton = true;
     },
-    ////////////////////////////////////////////
-    onFileChangeThree(e){
-     let fc=  funcTarget(e, onFileChangeReadThree, this.selectedFileType);
-      console.log(fc);
+
+   onFileChangeThree(e){
+       funcTarget(e, onFileChangeReadThree, this.selectedFileType).then(
+           parsedFuncData => {
+             this.selectedFileType = parsedFuncData.filter(x => x.productCount >= 0);
+             this.selectedFileType = parsedFuncData.filter(x => x.productCode >= 0);
+             this.selectedFileType = parsedFuncData.filter(x => x.price >= 0);
+           }
+       )
     },
-    ////////////////////////////////////////////
+
     onFileChangeTwo(e) {
       funcTarget(e, onFileChangeReadTwo).then(
           parsedFuncData => {
             this.twoColumnsParsedData = parsedFuncData.filter(x => x.productCount > 0);
           }
       );
-    },
+    }
   },
   computed: {
     showTwoColumns() {
       return this.twoColumnsParsedData.length > 0;
-    }
-  }
+    },
+
+  showTreeColumns() {
+    return this.selectedFileType.length;
+  },
+  },
   }
 
 
